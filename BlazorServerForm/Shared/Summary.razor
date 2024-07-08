@@ -1,0 +1,31 @@
+﻿@page "/summary"
+@inject IJSRuntime JS
+@inject IQuestionsService QuizService
+
+<h3>Respuestas seleccionadas</h3>
+<p>Comprueba tus respuestas antes de enviarlas definitivamente.</p>
+
+@foreach (var question in QuizService.GetQuestions())
+{
+    if (question.SelectedOption != null)
+    {
+        <p><b>@question.Text:</b> @question.SelectedOptionText =====================> Id de la respuesta: @question.SelectedOption</p>
+    }
+    else
+    {
+        <p><b>@question.Text:</b> Sin respuesta.</p>
+    }
+}
+
+<button class="btn btn-primary" @onclick="Submit">Enviar</button>
+
+@code {
+    private async Task Submit()
+    {
+        var selectedAnswersByQuestion = QuizService.GetSelectedAnswersByQuestion();
+        // TODO: Enviar a la API 
+
+        await JS.InvokeVoidAsync("alert", 
+        $"Estas son las opciones que se enviarán a la API: {Environment.NewLine + string.Join(Environment.NewLine, selectedAnswersByQuestion)}");
+    }
+}

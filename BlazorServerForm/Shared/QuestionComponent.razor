@@ -1,0 +1,54 @@
+﻿@page "/question/{Id:int}"
+@inject IQuestionsService QuizService
+
+@if (question != null)
+{
+    <h3>@question.Text</h3>
+    <p>Selecciona una de las siguientes opciones:</p>
+
+    @foreach (var option in question.Options)
+    {
+        if (option.Key == question.SelectedOption)
+        {
+            <div class="form-check">
+                <input class="" type="radio" name="@($"options_{Id}")" id="@option.Key" value="@option.Key"
+                    @onchange="OnOptionSelected" checked="checked" />
+                <label class="form-check-label" for="@option.Key">
+                    @option.Value
+                </label>
+            </div>
+        } 
+        else
+        {
+            <div class="form-check">
+                <input class="" type="radio" name="@($"options_{Id}")" id="@option.Key" value="@option.Key"
+                    @onchange="OnOptionSelected" />
+                <label class="form-check-label" for="@option.Key">
+                    @option.Value
+                </label>
+            </div>
+        }
+    }
+}
+
+@code {
+    [Parameter]
+    [EditorRequired]
+    public int Id { get; set; }
+
+    private Question question = null!;
+
+    protected override void OnParametersSet()
+    {
+        question = QuizService.GetQuestions().FirstOrDefault(q => q.Id == Id)!;
+    }
+
+    private void OnOptionSelected(ChangeEventArgs e)
+    {
+        if (e.Value != null)
+        {
+            var selectedOption = int.Parse(e.Value.ToString());
+            QuizService.SetAnswer(Id, selectedOption);
+        }
+    }
+}
